@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import MetricCreateView, AlertListView
+from .views import AddMetric, AlertList
 
 urlpatterns = [
-    path('', MetricCreateView.as_view(), name='metric-create'),
-    path('alerts/', AlertListView.as_view(), name='alert-list'),
+    path('', AddMetric.as_view(), name='metric-create'),
+    path('alerts/', AlertList.as_view(), name='alert-list'),
 ]

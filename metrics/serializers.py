@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Metric, Alert
 
-
 class MetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metric
@@ -10,19 +9,18 @@ class MetricSerializer(serializers.ModelSerializer):
 
     def validate_cpu_usage(self, value):
         if value < 0 or value > 100:
-            raise serializers.ValidationError("CPU usage 0 va 100 oralig'ida bo'lishi kerak")
+            raise serializers.ValidationError("CPU 0-100 oraligi")
         return value
 
     def validate_ram_usage(self, value):
         if value < 0 or value > 100:
-            raise serializers.ValidationError("RAM usage 0 va 100 oralig'ida bo'lishi kerak")
+            raise serializers.ValidationError("RAM 0-100 oraligi")
         return value
 
     def validate_disk_usage(self, value):
         if value < 0 or value > 100:
-            raise serializers.ValidationError("Disk usage 0 va 100 oralig'ida bo'lishi kerak")
+            raise serializers.ValidationError("Disk 0-100 oraligi")
         return value
-
 
 class AlertSerializer(serializers.ModelSerializer):
     class Meta:

@@ -7,69 +7,69 @@ from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent / '.env')
 
-BASE_URL = os.getenv('API_URL', 'http://127.0.0.1:8000')
-USERNAME = os.getenv('API_USERNAME', 'demo')
-PASSWORD = os.getenv('API_PASSWORD', 'demo123')
-SERVER_ID = int(os.getenv('SERVER_ID', 3))
+api_url = os.getenv('API_URL', 'http://127.0.0.1:8000')
+login_name = os.getenv('API_USERNAME', 'demo')
+login_pass = os.getenv('API_PASSWORD', 'demo123')
+server_id = int(os.getenv('SERVER_ID', 3))
 
-token = None
+my_token = None
 
-
-def login():
-    global token
-    url = f"{BASE_URL}/api/auth/login/"
+def get_token():
+    global my_token
+    url = f"{api_url}/api/auth/login/"
     try:
-        resp = requests.post(url, json={
-            "username": USERNAME,
-            "password": PASSWORD
+        r = requests.post(url, json={
+            "username": login_name,
+            "password": login_pass
         }, timeout=10)
-        if resp.status_code == 200:
-            data = resp.json()
-            token = data['access']
-            print(f"Logged in. Token obtained.")
+        if r.status_code == 200:
+            data = r.json()
+            my_token = data['access']
+            print("Token ok")
         else:
-            print(f"Login failed: {resp.status_code} {resp.text}")
-            token = None
+            print(f"Login error: {r.status_code} {r.text}")
+            my_token = None
     except requests.exceptions.RequestException as e:
-        print(f"Login error: {e}")
-        token = None
+        print(f"Error: {e}")
+        my_token = None
 
 
-def collect_metrics():
+def get_data():
+    cpu = psutil.cpu_percent(interval=1)
+    ram = psutil.virtual_memory().percent
+    disk = psutil.disk_usage('/').percent
     return {
-        "server": SERVER_ID,
-        "cpu_usage": psutil.cpu_percent(interval=1),
-        "ram_usage": psutil.virtual_memory().percent,
-        "disk_usage": psutil.disk_usage('/').percent
+        "server": server_id,
+        "cpu_usage": cpu,
+        "ram_usage": ram,
+        "disk_usage": disk
     }
 
-
-def send_metrics():
-    global token
-    if not token:
-        login()
-        if not token:
+def send():
+    global my_token
+    if not my_token:
+        get_token()
+        if not my_token:
             return
-
     headers = {
-        "Authorization": f"Bearer {token}",
+        "Authorization": f"Bearer {my_token}",
         "Content-Type": "application/json"
     }
-    data = collect_metrics()
+    data = get_data()
     try:
-        response = requests.post(f"{BASE_URL}/api/metrics/", json=data, headers=headers, timeout=10)
-        if response.status_code == 401:
-            print("Token expired. Re-logging in...")
-            login()
+        r = requests.post(f"{api_url}/api/metrics/", json=data, headers=headers, timeout=10)
+        if r.status_code == 401:
+            print("Token expired")
+            get_token()
         else:
-            print(f"Status: {response.status_code}")
-            print(f"Response: {response.json()}")
+            print(f"Status: {r.status_code}")
+            print(f"Response: {r.json()}")
     except requests.exceptions.RequestException as e:
-        print(f"Send error: {e}")
+        print(f"Error send: {e}")
 
 
 if __name__ == "__main__":
-    login()
+    get_token()
     while True:
-        send_metrics()
+        send()
         time.sleep(10)

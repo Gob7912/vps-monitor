@@ -2,8 +2,7 @@ from rest_framework import generics, permissions
 from .models import Server
 from .serializers import ServerSerializer
 
-
-class ServerListCreateView(generics.ListCreateAPIView):
+class ServerView(generics.ListCreateAPIView):
     serializer_class = ServerSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -13,8 +12,7 @@ class ServerListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-
-class ServerDetailView(generics.RetrieveAPIView):
+class SingleServer(generics.RetrieveAPIView):
     serializer_class = ServerSerializer
     permission_classes = [permissions.IsAuthenticated]
 

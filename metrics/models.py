@@ -14,14 +14,9 @@ class Metric(models.Model):
 
 
 class Alert(models.Model):
-    LEVEL_CHOICES = [
-        ('warning', 'Warning'),
-        ('critical', 'Critical'),
-    ]
-
     server = models.ForeignKey(Server, on_delete=models.CASCADE, related_name='alerts')
     message = models.CharField(max_length=255)
-    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='warning')
+    level = models.CharField(max_length=20, default='critical')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

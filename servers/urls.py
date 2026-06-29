@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import ServerListCreateView, ServerDetailView
+from .views import ServerView, SingleServer
 
 urlpatterns = [
-    path('', ServerListCreateView.as_view(), name='server-list-create'),
-    path('<int:pk>/', ServerDetailView.as_view(), name='server-detail'),
+    path('', ServerView.as_view(), name='server-list-create'),
+    path('<int:pk>/', SingleServer.as_view(), name='server-detail'),
 ]
